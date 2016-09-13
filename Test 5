@@ -1,0 +1,42 @@
+<?php
+$data = array("token" => "42e375ea6007fb0d8b353b5365844baf");                                                                    
+$data_string = json_encode($data);                                                  
+$webpage = curl_init('http://challenge.code2040.org/api/dating');                                                                      
+curl_setopt($webpage, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
+curl_setopt($webpage, CURLOPT_POSTFIELDS, $data_string);  
+
+curl_setopt($webpage, CURLOPT_RETURNTRANSFER, true);                                                                      
+curl_setopt($webpage, CURLOPT_HTTPHEADER, array(
+	'Content-Type: application/json',
+    'Content-Length: ' . strlen($data_string)) 
+);                                       
+
+
+$result = curl_exec($webpage);
+$arr1 = explode(",", $result);
+$nedd = explode("\"", $arr1[0]);
+$acneed = $nedd[3];
+$secondtime = explode(":", $arr1[1]);
+$secondtime = substr($secondtime[1], 0, -1);
+$secondtime = "PT".$secondtime."S";
+
+$date = new DateTime($acneed);
+$date->add(new DateInterval($secondtime));
+$result = date("c", $date->getTimestamp());
+$result = substr($result, 0, -6);
+$result .= "Z";
+
+$data2 = array("token" => "42e375ea6007fb0d8b353b5365844baf", "datestamp" => "$result");                                                                    
+$data_string2 = json_encode($data2);                                                  
+$webpage2 = curl_init('http://challenge.code2040.org/api/dating/validate');                                                                      
+curl_setopt($webpage2, CURLOPT_CUSTOMREQUEST, "POST");                                                                     
+curl_setopt($webpage2, CURLOPT_POSTFIELDS, $data_string2);  
+                                                   
+curl_setopt($webpage2, CURLOPT_HTTPHEADER, array(                                                                          
+    'Content-Type: application/json',                                                                                
+    'Content-Length: ' . strlen($data_string2))                                                                   
+);                                                                  
+
+curl_exec($webpage2);
+
+?>
